@@ -1,3 +1,7 @@
 source 'https://rubygems.org'
 gem 'sinatra'
 gem 'json'
+gem 'rake'
+gem 'redis'
+gem 'resque', '~> 2.0.0.pre.1', github: 'resque/resque'
+gem 'pry'
