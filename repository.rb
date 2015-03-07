@@ -1,25 +1,33 @@
 class Repository
 
   def initialize
-    @url = Cocaine::CommandLine.new("cat repository.info").run
+    @url = File.read('repository.info')
   end
 
   def name
     @url.split("/").last.split(".git").first
   end
 
+  def dir
+    "repos/#{name}"
+  end
+
   def clone
-    unless File.directory?(name)
-      Cocaine::CommandLine.new("git clone #{@url}").run
+    unless File.directory?(dir)
+      FileUtils.mkdir_p 'repos'
+      Cocaine::CommandLine.new("cd repos; git clone #{@url}").run
     end
   end
 
   def pull
-    Cocaine::CommandLine.new("cd #{name}; git reset --hard; git pull").run
+    Cocaine::CommandLine.new("cd #{dir}; git reset --hard; git pull").run
   end
 
   def self.setup url
-    Cocaine::CommandLine.new("echo '#{url}' > repository.info").run
+    file = File.open( "repository.info", "w" )
+    file << url
+    file.close
+
     repo= self.new
     repo.clone
     repo
