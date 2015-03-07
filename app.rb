@@ -2,8 +2,9 @@ require 'pry'
 require 'bundler'
 require 'resque'
 require 'redis'
-require './build_and_distribute_job'
 require './repository'
+require './repository_setup_job'
+require './build_and_distribute_job'
 
 Bundler.require
 
@@ -27,8 +28,12 @@ get '/logs' do
   git_logs.map{|l| l.to_h}.to_json
 end
 
+post '/setup' do
+  content_type :json
+  Resque.enqueue(RepositorySetupJob, params)
+  {}.to_json
+end
+
 def create_file filename, content
   File.open(filename, 'w') { |file| file.write(content) }
 end
-
-
