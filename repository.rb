@@ -1,3 +1,4 @@
+require './git_log'
 class Repository
 
   def initialize
@@ -23,6 +24,10 @@ class Repository
     Cocaine::CommandLine.new("cd #{dir}; git reset --hard; git pull").run
   end
 
+  def logs page_num
+    GitLog.all(Cocaine::CommandLine.new("cd #{dir}; #{log_message(page_num)}").run)
+  end
+
   def self.setup url
     file = File.open( "repository.info", "w" )
     file << url
@@ -31,5 +36,11 @@ class Repository
     repo= self.new
     repo.clone
     repo
+  end
+
+  private
+  def log_message page_num
+    skip = (page_num-1)*10
+    "git log -n 10 --pretty=format:%H+0+%s+0+%at --skip=#{skip}"
   end
 end
